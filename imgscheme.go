@@ -29,7 +29,9 @@ func (c RGB) RGBA() (r, g, b, a uint32) {
 	return r, g, b, math.MaxUint16
 }
 
-// TODO: Implement RGB.String() (convert to a hex string)
+func (c RGB) String() string {
+	return fmt.Sprintf("#%02x%02x%02x", c.R, c.G, c.B)
+}
 
 const Size = 16
 
