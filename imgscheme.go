@@ -109,6 +109,9 @@ ImageLoop:
 	for i := range counts {
 		if len(counts[i].Colors) == 0 {
 			// TODO: find a better behavior for unset colors
+			// Perhaps search through all other ByCounts for the
+			// nearest color - should counts be generated in one go
+			// and then iterated over for each place?
 			s[i] = RGB{0, 0, 0}
 			continue
 		}
