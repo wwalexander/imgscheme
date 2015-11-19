@@ -51,7 +51,6 @@ var (
 	}
 )
 
-
 // Counts returns a map of the colors in m and the frequency of each color.
 func Counts(m image.Image) map[color.Color]int {
 	bounds := m.Bounds()
@@ -94,7 +93,7 @@ func BestMatch(m image.Image, base color.Palette) color.Palette {
 
 // A ColorDistance contains a color and its distance from another color.
 type ColorDistance struct {
-	Color color.Color
+	Color    color.Color
 	Distance float64
 }
 
@@ -102,9 +101,9 @@ type ColorDistance struct {
 func Distance(a, b color.Color) float64 {
 	ra, ga, ba, _ := a.RGBA()
 	rb, gb, bb, _ := b.RGBA()
-	return math.Sqrt(math.Pow(float64(ra) - float64(rb), 2) +
-		math.Pow(float64(ga) - float64(gb), 2) +
-		math.Pow(float64(ba) - float64(bb), 2))
+	return math.Sqrt(math.Pow(float64(ra)-float64(rb), 2) +
+		math.Pow(float64(ga)-float64(gb), 2) +
+		math.Pow(float64(ba)-float64(bb), 2))
 }
 
 // NearestMatch returns the closest color in m to each color in base.
@@ -177,8 +176,8 @@ func main() {
 	for _, c := range NewScheme(m, SchemeVGA) {
 		r, g, b, _ := c.RGBA()
 		fmt.Printf("#%02x%02x%02x\n",
-			uint8(r >> 8),
-			uint8(g >> 8),
-			uint8(b >> 8))
+			uint8(r>>8),
+			uint8(g>>8),
+			uint8(b>>8))
 	}
 }
