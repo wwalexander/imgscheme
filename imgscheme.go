@@ -36,21 +36,21 @@ const Size = 16
 var (
 	// TODO: Add more colorschemes
 	SchemeVGA = color.Palette{
-		RGB{  0,   0,   0},
-		RGB{170,   0,   0},
-		RGB{  0, 170,   0},
-		RGB{170,  85,   0},
-		RGB{  0,   0, 170},
-		RGB{170,   0, 170},
-		RGB{  0, 170, 170},
+		RGB{0, 0, 0},
+		RGB{170, 0, 0},
+		RGB{0, 170, 0},
+		RGB{170, 85, 0},
+		RGB{0, 0, 170},
+		RGB{170, 0, 170},
+		RGB{0, 170, 170},
 		RGB{170, 170, 170},
-		RGB{ 85,  85,  85},
-		RGB{255,  85,  85},
-		RGB{ 85, 255,  85},
-		RGB{255, 255,  85},
-		RGB{ 85,  85, 255},
-		RGB{255,  85, 255},
-		RGB{ 85, 255, 255},
+		RGB{85, 85, 85},
+		RGB{255, 85, 85},
+		RGB{85, 255, 85},
+		RGB{255, 255, 85},
+		RGB{85, 85, 255},
+		RGB{255, 85, 255},
+		RGB{85, 255, 255},
 		RGB{255, 255, 255},
 	}
 )
@@ -116,11 +116,11 @@ ImageLoop:
 			continue
 		}
 		r, g, b, _ := counts[i].Colors[0].RGBA()
-		c := RGB {
+		c := RGB{
 			R: uint8(r >> 8),
 			G: uint8(g >> 8),
 			B: uint8(b >> 8),
-		}	
+		}
 		s[i] = c
 	}
 	return s
