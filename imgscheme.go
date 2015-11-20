@@ -198,7 +198,7 @@ func ParseTriplet(triplet string) (RGB, error) {
 	return c, nil
 }
 
-// ReadBase reads a base color scheme from file.
+// ReadBase reads a base color scheme from the file located at path.
 func ReadBase(path string) (color.Palette, error) {
 	file, err := os.Open(path)
 	defer file.Close()
