@@ -89,19 +89,19 @@ var Bases = map[string]color.Palette{
 
 // Colors returns a color.Palette containing the colors in m, and a map from
 // each color to the number of times it appears in m.
-func Colors(m image.Image) (color.Palette, map[color.Color]int) {
+func Colors(m image.Image) (colors color.Palette, counts map[color.Color]int) {
 	bounds := m.Bounds()
-	p := make(color.Palette, 0, bounds.Max.X*bounds.Max.Y)
-	counts := make(map[color.Color]int)
+	colors = make(color.Palette, 0, bounds.Max.X*bounds.Max.Y)
+	counts = make(map[color.Color]int)
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
 			c := m.At(x, y)
-			p = append(p, c)
+			colors = append(colors, c)
 			count := counts[c]
 			counts[c] = count + 1
 		}
 	}
-	return p, counts
+	return colors, counts
 }
 
 // A ColorCount contains a color and the number of times it appears in an image.
