@@ -36,6 +36,7 @@ type RGB struct {
 	R, G, B uint8
 }
 
+// RGBA satisfies the color.Color interface for RGB.
 func (c RGB) RGBA() (r, g, b, a uint32) {
 	r = uint32(c.R)
 	r |= r << 8
@@ -129,7 +130,7 @@ func BestMatch(m image.Image, base color.Palette) color.Palette {
 // NearestMatch returns the closest color in m to each color in base.
 func NearestMatch(m image.Image, base color.Palette) color.Palette {
 	bounds := m.Bounds()
-	p := make(color.Palette, 0, bounds.Max.X * bounds.Max.Y)
+	p := make(color.Palette, 0, bounds.Max.X*bounds.Max.Y)
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
 			p = append(p, m.At(x, y))
@@ -206,9 +207,7 @@ func ReadBase(path string) (color.Palette, error) {
 	}
 	r := bufio.NewReader(file)
 	var s color.Palette
-	for line, err := r.ReadString('\n');
-		err == nil;
-		line, err = r.ReadString('\n') {
+	for line, err := r.ReadString('\n'); err == nil; line, err = r.ReadString('\n') {
 		line = strings.TrimSuffix(line, "\n")
 		c, err := ParseTriplet(line)
 		if err != nil {
