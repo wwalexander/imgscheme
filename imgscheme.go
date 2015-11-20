@@ -164,8 +164,8 @@ type ColorCount struct {
 	Count int
 }
 
-// NewScheme creates a color scheme using the colors in m, following the color
-// base color scheme.
+// NewScheme creates a color scheme using the colors in m, following the base
+// color scheme
 func NewScheme(m image.Image, base color.Palette) color.Palette {
 	p, counts := Colors(m)
 	ccs := make([]ColorCount, len(base))
