@@ -126,44 +126,20 @@ func BestMatch(m image.Image, base color.Palette) color.Palette {
 	return s
 }
 
-// A ColorDistance contains a color and its distance from another color.
-type ColorDistance struct {
-	Color    color.Color
-	Distance float64
-}
-
-// Distance returns the Euclidean distance between a and b.
-func Distance(a, b color.Color) float64 {
-	ra, ga, ba, _ := a.RGBA()
-	rb, gb, bb, _ := b.RGBA()
-	return math.Sqrt(math.Pow(float64(ra)-float64(rb), 2) +
-		math.Pow(float64(ga)-float64(gb), 2) +
-		math.Pow(float64(ba)-float64(bb), 2))
-}
-
 // NearestMatch returns the closest color in m to each color in base.
 func NearestMatch(m image.Image, base color.Palette) color.Palette {
-	cds := make([]ColorDistance, len(base))
-	for i := range cds {
-		cds[i].Distance = math.MaxFloat64
-	}
 	bounds := m.Bounds()
+	p := make(color.Palette, 0, bounds.Max.X * bounds.Max.Y)
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
-			c := m.At(x, y)
-			for i, cbase := range base {
-				if distance := Distance(cbase, c); distance <= cds[i].Distance {
-					cds[i].Color = c
-					cds[i].Distance = distance
-				}
-			}
+			p = append(p, m.At(x, y))
 		}
 	}
-	cs := make(color.Palette, len(cds))
-	for i, cd := range cds {
-		cs[i] = cd.Color
+	s := make(color.Palette, len(base))
+	for i, c := range base {
+		s[i] = p.Convert(c)
 	}
-	return cs
+	return s
 }
 
 // NewScheme creates a color scheme using the colors in m, following the color
