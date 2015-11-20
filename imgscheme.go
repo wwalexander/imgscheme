@@ -17,6 +17,60 @@ import (
 	"strings"
 )
 
+// ParseChannel parses a channel from a hex triplet into a uint8.
+func ParseChannel(channel string) (uint8, error) {
+	ch, err := strconv.ParseUint(channel, 16, 8)
+	if err != nil {
+		return 0, err
+	}
+	return uint8(ch), nil
+}
+
+// ParseTriplet parses a hex triplet into an RGB.
+func ParseTriplet(triplet string) (RGB, error) {
+	length := len(triplet)
+	if triplet[0] != '#' || length != 7 {
+		log.Println(triplet[0], length)
+		fmt.Print(triplet)
+		return RGB{}, errors.New("malformed hex triplet in base color scheme")
+	}
+	var c RGB
+	var err error
+	c.R, err = ParseChannel(triplet[1:3])
+	if err != nil {
+		return RGB{}, err
+	}
+	c.G, err = ParseChannel(triplet[3:5])
+	if err != nil {
+		return RGB{}, err
+	}
+	c.B, err = ParseChannel(triplet[5:7])
+	if err != nil {
+		return RGB{}, err
+	}
+	return c, nil
+}
+
+// ReadBase reads a base color scheme from the file located at path.
+func ReadBase(path string) (color.Palette, error) {
+	file, err := os.Open(path)
+	defer file.Close()
+	if err != nil {
+		return nil, err
+	}
+	r := bufio.NewReader(file)
+	var s color.Palette
+	for line, err := r.ReadString('\n'); err == nil; line, err = r.ReadString('\n') {
+		line = strings.TrimSuffix(line, "\n")
+		c, err := ParseTriplet(line)
+		if err != nil {
+			return nil, err
+		}
+		s = append(s, c)
+	}
+	return s, nil
+}
+
 // ReadImage reads an image.Image from the file located at path.
 func ReadImage(path string) (image.Image, error) {
 	file, err := os.Open(path)
@@ -133,60 +187,6 @@ func NewScheme(m image.Image, base color.Palette) color.Palette {
 		}
 	}
 	return s
-}
-
-// ParseChannel parses a channel from a hex triplet into a uint8.
-func ParseChannel(channel string) (uint8, error) {
-	ch, err := strconv.ParseUint(channel, 16, 8)
-	if err != nil {
-		return 0, err
-	}
-	return uint8(ch), nil
-}
-
-// ParseTriplet parses a hex triplet into an RGB.
-func ParseTriplet(triplet string) (RGB, error) {
-	length := len(triplet)
-	if triplet[0] != '#' || length != 7 {
-		log.Println(triplet[0], length)
-		fmt.Print(triplet)
-		return RGB{}, errors.New("malformed hex triplet in base color scheme")
-	}
-	var c RGB
-	var err error
-	c.R, err = ParseChannel(triplet[1:3])
-	if err != nil {
-		return RGB{}, err
-	}
-	c.G, err = ParseChannel(triplet[3:5])
-	if err != nil {
-		return RGB{}, err
-	}
-	c.B, err = ParseChannel(triplet[5:7])
-	if err != nil {
-		return RGB{}, err
-	}
-	return c, nil
-}
-
-// ReadBase reads a base color scheme from the file located at path.
-func ReadBase(path string) (color.Palette, error) {
-	file, err := os.Open(path)
-	defer file.Close()
-	if err != nil {
-		return nil, err
-	}
-	r := bufio.NewReader(file)
-	var s color.Palette
-	for line, err := r.ReadString('\n'); err == nil; line, err = r.ReadString('\n') {
-		line = strings.TrimSuffix(line, "\n")
-		c, err := ParseTriplet(line)
-		if err != nil {
-			return nil, err
-		}
-		s = append(s, c)
-	}
-	return s, nil
 }
 
 func main() {
