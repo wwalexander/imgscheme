@@ -84,7 +84,6 @@ var Bases = map[string]color.Palette{
 		RGB{0x00, 0xff, 0xff},
 		RGB{0xff, 0xff, 0xff},
 	},
-	// TODO: Add OS X Terminal and Windows cmd.exe colorschemes
 }
 
 // Counts returns a map of the colors in m and the frequency of each color.
