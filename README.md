@@ -24,8 +24,8 @@ Options
 
 `-base`: the base color scheme file to use, or a built-in color scheme:
 
-    * `vga`
-    * `xterm`
+* `vga`
+* `xterm`
 
 (default `vga`)
 
