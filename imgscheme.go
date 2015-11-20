@@ -91,7 +91,7 @@ var Bases = map[string]color.Palette{
 // each color to the number of times it appears in m.
 func Colors(m image.Image) (color.Palette, map[color.Color]int) {
 	bounds := m.Bounds()
-	p := make(color.Palette, 0, bounds.Max.X * bounds.Max.Y)
+	p := make(color.Palette, 0, bounds.Max.X*bounds.Max.Y)
 	counts := make(map[color.Color]int)
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
