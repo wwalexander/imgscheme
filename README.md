@@ -23,8 +23,11 @@ Options
 -------
 
 `-base`: the base color scheme file to use, or a built-in color scheme:
+
     * `vga`
     * `xterm`
+
+(default `vga`)
 
 Color scheme files
 ------------------
