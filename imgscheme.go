@@ -87,18 +87,21 @@ var Bases = map[string]color.Palette{
 	},
 }
 
-// Counts returns a map of the colors in m and the frequency of each color.
-func Counts(m image.Image) map[color.Color]int {
+// Colors returns a color.Palette containing the colors in m, and a map from
+// each color to the number of times it appears in m.
+func Colors(m image.Image) (color.Palette, map[color.Color]int) {
 	bounds := m.Bounds()
+	p := make(color.Palette, 0, bounds.Max.X * bounds.Max.Y)
 	counts := make(map[color.Color]int)
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
 			c := m.At(x, y)
+			p = append(p, c)
 			count := counts[c]
 			counts[c] = count + 1
 		}
 	}
-	return counts
+	return p, counts
 }
 
 // A ColorCount contains a color and the number of times it appears in an image.
@@ -107,9 +110,10 @@ type ColorCount struct {
 	Count int
 }
 
-// BestMatch returns the most frequent color in m for each place.
-func BestMatch(m image.Image, base color.Palette) color.Palette {
-	counts := Counts(m)
+// NewScheme creates a color scheme using the colors in m, following the color
+// base color scheme.
+func NewScheme(m image.Image, base color.Palette) color.Palette {
+	p, counts := Colors(m)
 	ccs := make([]ColorCount, len(base))
 	for c, count := range counts {
 		// TODO: Try organizing colors by hue instead of Euclidean
@@ -122,44 +126,11 @@ func BestMatch(m image.Image, base color.Palette) color.Palette {
 	}
 	s := make(color.Palette, len(ccs))
 	for i, cc := range ccs {
-		s[i] = cc.Color
-	}
-	return s
-}
-
-// NearestMatch returns the closest color in m to each color in base.
-func NearestMatch(m image.Image, base color.Palette) color.Palette {
-	bounds := m.Bounds()
-	p := make(color.Palette, 0, bounds.Max.X*bounds.Max.Y)
-	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
-		for x := bounds.Min.X; x < bounds.Max.X; x++ {
-			p = append(p, m.At(x, y))
+		if cc.Count == 0 {
+			s[i] = p.Convert(base[i])
+		} else {
+			s[i] = cc.Color
 		}
-	}
-	s := make(color.Palette, len(base))
-	for i, c := range base {
-		s[i] = p.Convert(c)
-	}
-	return s
-}
-
-// NewScheme creates a color scheme using the colors in m, following the color
-// base color scheme.
-func NewScheme(m image.Image, base color.Palette) color.Palette {
-	s := BestMatch(m, base)
-	var missing []int
-	var missingColors color.Palette
-	for place, c := range s {
-		if c == nil {
-			missing = append(missing, place)
-			missingColors = append(missingColors, base[place])
-		}
-	}
-	nearest := NearestMatch(m, missingColors)
-	i := 0
-	for _, match := range nearest {
-		s[missing[i]] = match
-		i++
 	}
 	return s
 }
