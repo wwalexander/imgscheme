@@ -101,6 +101,54 @@ func (c RGB) RGBA() (r, g, b, a uint32) {
 	return r, g, b, math.MaxUint16
 }
 
+// Colors returns a color.Palette containing the colors in m, and a map from
+// each color to the number of times it appears in m.
+func Colors(m image.Image) (colors color.Palette, counts map[color.Color]int) {
+	bounds := m.Bounds()
+	colors = make(color.Palette, 0, bounds.Max.X*bounds.Max.Y)
+	counts = make(map[color.Color]int)
+	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+		for x := bounds.Min.X; x < bounds.Max.X; x++ {
+			c := m.At(x, y)
+			colors = append(colors, c)
+			count := counts[c]
+			counts[c] = count + 1
+		}
+	}
+	return colors, counts
+}
+
+// A ColorCount contains a color and the number of times it appears in an image.
+type ColorCount struct {
+	Color color.Color
+	Count int
+}
+
+// NewScheme creates a color scheme using the colors in m, following the base
+// color scheme.
+func NewScheme(m image.Image, base color.Palette) color.Palette {
+	p, counts := Colors(m)
+	ccs := make([]ColorCount, len(base))
+	for c, count := range counts {
+		// TODO: Try organizing colors by hue instead of Euclidean
+		// distance - maybe use luminance for black/white
+		i := base.Index(c)
+		if count > ccs[i].Count {
+			ccs[i].Color = c
+			ccs[i].Count = count
+		}
+	}
+	s := make(color.Palette, len(ccs))
+	for i, cc := range ccs {
+		if cc.Count == 0 {
+			s[i] = p.Convert(base[i])
+		} else {
+			s[i] = cc.Color
+		}
+	}
+	return s
+}
+
 // Bases is a map of strings and their corresponding base color schemes.
 var Bases = map[string]color.Palette{
 	"vga": {
@@ -139,54 +187,6 @@ var Bases = map[string]color.Palette{
 		RGB{0x00, 0xff, 0xff},
 		RGB{0xff, 0xff, 0xff},
 	},
-}
-
-// Colors returns a color.Palette containing the colors in m, and a map from
-// each color to the number of times it appears in m.
-func Colors(m image.Image) (colors color.Palette, counts map[color.Color]int) {
-	bounds := m.Bounds()
-	colors = make(color.Palette, 0, bounds.Max.X*bounds.Max.Y)
-	counts = make(map[color.Color]int)
-	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
-		for x := bounds.Min.X; x < bounds.Max.X; x++ {
-			c := m.At(x, y)
-			colors = append(colors, c)
-			count := counts[c]
-			counts[c] = count + 1
-		}
-	}
-	return colors, counts
-}
-
-// A ColorCount contains a color and the number of times it appears in an image.
-type ColorCount struct {
-	Color color.Color
-	Count int
-}
-
-// NewScheme creates a color scheme using the colors in m, following the base
-// color scheme
-func NewScheme(m image.Image, base color.Palette) color.Palette {
-	p, counts := Colors(m)
-	ccs := make([]ColorCount, len(base))
-	for c, count := range counts {
-		// TODO: Try organizing colors by hue instead of Euclidean
-		// distance - maybe use luminance for black/white
-		i := base.Index(c)
-		if count > ccs[i].Count {
-			ccs[i].Color = c
-			ccs[i].Count = count
-		}
-	}
-	s := make(color.Palette, len(ccs))
-	for i, cc := range ccs {
-		if cc.Count == 0 {
-			s[i] = p.Convert(base[i])
-		} else {
-			s[i] = cc.Color
-		}
-	}
-	return s
 }
 
 func main() {
