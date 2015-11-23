@@ -112,32 +112,31 @@ func colors(m image.Image) (colors color.Palette, counts map[color.Color]int) {
 	return colors, counts
 }
 
-// A ColorCount contains a color and the number of times it appears in an image.
-type ColorCount struct {
-	Color color.Color
-	Count int
+type colorCount struct {
+	color color.Color
+	count int
 }
 
 // NewScheme creates a color scheme using the colors in m, following the base
 // color scheme.
 func NewScheme(m image.Image, base color.Palette) color.Palette {
 	p, counts := colors(m)
-	ccs := make([]ColorCount, len(base))
+	ccs := make([]colorCount, len(base))
 	for c, count := range counts {
 		// TODO: Try organizing colors by hue instead of Euclidean
 		// distance - maybe use luminance for black/white
 		i := base.Index(c)
-		if count > ccs[i].Count {
-			ccs[i].Color = c
-			ccs[i].Count = count
+		if count > ccs[i].count {
+			ccs[i].color = c
+			ccs[i].count = count
 		}
 	}
 	s := make(color.Palette, len(ccs))
 	for i, cc := range ccs {
-		if cc.Count == 0 {
+		if cc.count == 0 {
 			s[i] = p.Convert(base[i])
 		} else {
-			s[i] = cc.Color
+			s[i] = cc.color
 		}
 	}
 	return s
