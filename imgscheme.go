@@ -171,7 +171,7 @@ var SchemeVGA = color.Palette{
 
 const usage = `usage: imgscheme [-base path] [path]
 
-imgscheme generates a terminal color scheme from the image located at path. It
+imgscheme generates a terminal color scheme from the image at the named path. It
 attempts to make the generated colors correspond to prominent colors in the
 image, and also close to the corresponding colors in a base color scheme. A base
 color scheme file can be specified using the -base flag; this file should
