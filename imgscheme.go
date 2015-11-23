@@ -56,7 +56,7 @@ func ReadBase(path string) (color.Palette, error) {
 	file, err := os.Open(path)
 	defer file.Close()
 	if err != nil {
-		return nil, err
+		return color.Palette{}, err
 	}
 	r := bufio.NewReader(file)
 	var s color.Palette
@@ -64,7 +64,7 @@ func ReadBase(path string) (color.Palette, error) {
 		line = strings.TrimSuffix(line, "\n")
 		c, err := ParseTriplet(line)
 		if err != nil {
-			return nil, err
+			return color.Palette{}, err
 		}
 		s = append(s, c)
 	}
@@ -149,65 +149,52 @@ func NewScheme(m image.Image, base color.Palette) color.Palette {
 	return s
 }
 
-// Bases is a map of strings and their corresponding base color schemes.
-var Bases = map[string]color.Palette{
-	"vga": {
-		RGB{0x00, 0x00, 0x00},
-		RGB{0xaa, 0x00, 0x00},
-		RGB{0x00, 0xaa, 0x00},
-		RGB{0xaa, 0x55, 0x00},
-		RGB{0x00, 0x00, 0xaa},
-		RGB{0xaa, 0x00, 0xaa},
-		RGB{0x00, 0xaa, 0xaa},
-		RGB{0xaa, 0xaa, 0xaa},
-		RGB{0x55, 0x55, 0x55},
-		RGB{0xff, 0x55, 0x55},
-		RGB{0x55, 0xff, 0x55},
-		RGB{0xff, 0xff, 0x55},
-		RGB{0x55, 0x55, 0xff},
-		RGB{0xff, 0x55, 0xff},
-		RGB{0x55, 0xff, 0xff},
-		RGB{0xff, 0xff, 0xff},
-	},
-	"xterm": {
-		RGB{0x00, 0x00, 0x00},
-		RGB{0xcd, 0x00, 0x00},
-		RGB{0x00, 0xcd, 0x00},
-		RGB{0xcd, 0xcd, 0x00},
-		RGB{0x00, 0x00, 0xee},
-		RGB{0xcd, 0x00, 0xcd},
-		RGB{0x00, 0xcd, 0xcd},
-		RGB{0xe5, 0xe5, 0xe5},
-		RGB{0x7f, 0x7f, 0x7f},
-		RGB{0xff, 0x00, 0x00},
-		RGB{0x00, 0xff, 0x00},
-		RGB{0xff, 0xff, 0x00},
-		RGB{0x5c, 0x5c, 0xff},
-		RGB{0xff, 0x00, 0xff},
-		RGB{0x00, 0xff, 0xff},
-		RGB{0xff, 0xff, 0xff},
-	},
+// SchemeVGA is the standard VGA color scheme.
+var SchemeVGA = color.Palette{
+	RGB{0x00, 0x00, 0x00},
+	RGB{0xaa, 0x00, 0x00},
+	RGB{0x00, 0xaa, 0x00},
+	RGB{0xaa, 0x55, 0x00},
+	RGB{0x00, 0x00, 0xaa},
+	RGB{0xaa, 0x00, 0xaa},
+	RGB{0x00, 0xaa, 0xaa},
+	RGB{0xaa, 0xaa, 0xaa},
+	RGB{0x55, 0x55, 0x55},
+	RGB{0xff, 0x55, 0x55},
+	RGB{0x55, 0xff, 0x55},
+	RGB{0xff, 0xff, 0x55},
+	RGB{0x55, 0x55, 0xff},
+	RGB{0xff, 0x55, 0xff},
+	RGB{0x55, 0xff, 0xff},
+	RGB{0xff, 0xff, 0xff},
 }
 
+const usage = `imgscheme [-base path] [path]
+
+imgscheme generates a terminal color scheme from the image located at path. It
+attempts to make the generated colors correspond to prominent colors in the
+image, and also close to the corresponding colors in a base color scheme. A base
+color scheme file can be specified using the -base flag; this file should
+contain a newline-separated list of hex triplets. The generated colors will be
+output in the same order as the base color scheme. If the -base flag is not set,
+imgscheme will use the standard VGA color scheme; the first 8 triplets of the
+output will be the 8 normal colors in order (black, red, green, yellow, blue,
+magenta, cyan, and white) and the next 8 triplets will be the 8 bold colors in
+the same order.`
+
 func main() {
-	fbaseDesc := "the base color scheme file to use, or a built-in color scheme:\n"
-	for name := range Bases {
-		fbaseDesc += fmt.Sprintf("\t\t%s\n", name)
-	}
-	fbase := flag.String("base", "vga", fbaseDesc)
+	fbase := flag.String("base", "", "the base color scheme file to use")
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
-		fmt.Fprintf(os.Stderr, "%s [PATH]\n", os.Args[0])
+		fmt.Fprintln(os.Stderr, usage)
 	}
 	flag.Parse()
 	args := flag.Args()
 	if len(args) != 1 {
 		flag.Usage()
-		flag.PrintDefaults()
 		os.Exit(1)
 	}
-	base, ok := Bases[*fbase]
-	if !ok {
+	base := SchemeVGA
+	if *fbase != "" {
 		var err error
 		base, err = ReadBase(*fbase)
 		if err != nil {
