@@ -169,7 +169,7 @@ var SchemeVGA = color.Palette{
 	RGB{0xff, 0xff, 0xff},
 }
 
-const usage = `imgscheme [-base path] [path]
+const usage = `usage: imgscheme [-base path] [path]
 
 imgscheme generates a terminal color scheme from the image located at path. It
 attempts to make the generated colors correspond to prominent colors in the
