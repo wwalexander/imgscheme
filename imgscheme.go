@@ -17,8 +17,7 @@ import (
 	"strings"
 )
 
-// ParseChannel parses a channel from a hex triplet into a uint8.
-func ParseChannel(channel string) (uint8, error) {
+func parseChannel(channel string) (uint8, error) {
 	ch, err := strconv.ParseUint(channel, 16, 8)
 	if err != nil {
 		return 0, err
@@ -26,8 +25,7 @@ func ParseChannel(channel string) (uint8, error) {
 	return uint8(ch), nil
 }
 
-// ParseTriplet parses a hex triplet into an RGB.
-func ParseTriplet(triplet string) (RGB, error) {
+func parseTriplet(triplet string) (RGB, error) {
 	length := len(triplet)
 	if triplet[0] != '#' || length != 7 {
 		log.Println(triplet[0], length)
@@ -36,23 +34,22 @@ func ParseTriplet(triplet string) (RGB, error) {
 	}
 	var c RGB
 	var err error
-	c.R, err = ParseChannel(triplet[1:3])
+	c.R, err = parseChannel(triplet[1:3])
 	if err != nil {
 		return RGB{}, err
 	}
-	c.G, err = ParseChannel(triplet[3:5])
+	c.G, err = parseChannel(triplet[3:5])
 	if err != nil {
 		return RGB{}, err
 	}
-	c.B, err = ParseChannel(triplet[5:7])
+	c.B, err = parseChannel(triplet[5:7])
 	if err != nil {
 		return RGB{}, err
 	}
 	return c, nil
 }
 
-// ReadBase reads a base color scheme from the file located at path.
-func ReadBase(path string) (color.Palette, error) {
+func readBase(path string) (color.Palette, error) {
 	file, err := os.Open(path)
 	defer file.Close()
 	if err != nil {
@@ -62,7 +59,7 @@ func ReadBase(path string) (color.Palette, error) {
 	var s color.Palette
 	for line, err := r.ReadString('\n'); err == nil; line, err = r.ReadString('\n') {
 		line = strings.TrimSuffix(line, "\n")
-		c, err := ParseTriplet(line)
+		c, err := parseTriplet(line)
 		if err != nil {
 			return color.Palette{}, err
 		}
@@ -71,8 +68,7 @@ func ReadBase(path string) (color.Palette, error) {
 	return s, nil
 }
 
-// ReadImage reads an image.Image from the file located at path.
-func ReadImage(path string) (image.Image, error) {
+func readImage(path string) (image.Image, error) {
 	file, err := os.Open(path)
 	defer file.Close()
 	if err != nil {
@@ -90,7 +86,7 @@ type RGB struct {
 	R, G, B uint8
 }
 
-// RGBA satisfies the color.Color interface for RGB.
+// RGBA returns the color channels in c and a maximal alpha value.
 func (c RGB) RGBA() (r, g, b, a uint32) {
 	r = uint32(c.R)
 	r |= r << 8
@@ -101,9 +97,7 @@ func (c RGB) RGBA() (r, g, b, a uint32) {
 	return r, g, b, math.MaxUint16
 }
 
-// Colors returns a color.Palette containing the colors in m, and a map from
-// each color to the number of times it appears in m.
-func Colors(m image.Image) (colors color.Palette, counts map[color.Color]int) {
+func colors(m image.Image) (colors color.Palette, counts map[color.Color]int) {
 	bounds := m.Bounds()
 	colors = make(color.Palette, 0, bounds.Max.X*bounds.Max.Y)
 	counts = make(map[color.Color]int)
@@ -127,7 +121,7 @@ type ColorCount struct {
 // NewScheme creates a color scheme using the colors in m, following the base
 // color scheme.
 func NewScheme(m image.Image, base color.Palette) color.Palette {
-	p, counts := Colors(m)
+	p, counts := colors(m)
 	ccs := make([]ColorCount, len(base))
 	for c, count := range counts {
 		// TODO: Try organizing colors by hue instead of Euclidean
@@ -196,12 +190,12 @@ func main() {
 	base := SchemeVGA
 	if *fbase != "" {
 		var err error
-		base, err = ReadBase(*fbase)
+		base, err = readBase(*fbase)
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
-	m, err := ReadImage(args[0])
+	m, err := readImage(args[0])
 	if err != nil {
 		log.Fatal(err)
 	}
