@@ -27,7 +27,6 @@ the same order.
 The output of imgscheme can be rendered on
 [this page](https://wwalexander.github.io/imgscheme/).
 
-Options
--------
+### Options
 
 `-base`: the base color scheme file to use
