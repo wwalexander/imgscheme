@@ -25,7 +25,7 @@ func parseChannel(channel string) (uint8, error) {
 
 func parseTriplet(triplet string) (RGB, error) {
 	if len(triplet) != 6 {
-		return RGB{}, errors.New("malformed hex triplet in base color scheme")
+		return RGB{}, errors.New("malformed hex triplet in base color")
 	}
 	var c RGB
 	var err error
