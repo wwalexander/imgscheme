@@ -24,21 +24,20 @@ func parseChannel(channel string) (uint8, error) {
 }
 
 func parseTriplet(triplet string) (RGB, error) {
-	length := len(triplet)
-	if triplet[0] != '#' || length != 7 {
+	if len(triplet) != 6 {
 		return RGB{}, errors.New("malformed hex triplet in base color scheme")
 	}
 	var c RGB
 	var err error
-	c.R, err = parseChannel(triplet[1:3])
+	c.R, err = parseChannel(triplet[0:2])
 	if err != nil {
 		return RGB{}, err
 	}
-	c.G, err = parseChannel(triplet[3:5])
+	c.G, err = parseChannel(triplet[2:4])
 	if err != nil {
 		return RGB{}, err
 	}
-	c.B, err = parseChannel(triplet[5:7])
+	c.B, err = parseChannel(triplet[4:6])
 	if err != nil {
 		return RGB{}, err
 	}
@@ -139,14 +138,14 @@ var SchemeVGA = color.Palette{
 	RGB{0xff, 0xff, 0xff},
 }
 
-const usage = `usage: imgscheme [-[n] path] [path]
+const usage = `usage: imgscheme [-[n] color] [path]
 
 imgscheme generates a terminal color scheme from the image at the named path. It
 attempts to make the generated colors correspond to prominent colors in the
 image, and also close to the corresponding colors in a base color scheme. The
 colors in the base scheme can be set using numeric flags corresponding to the 16
-ANSI colors (0-15). The generated colors will be output in order as hex
-triplets.`
+ANSI colors (0-15) as hex triplets /[0-9a-f]{6}/ The generated colors will be
+output in order as hex triplets.`
 
 func main() {
 	colors := []*string{
@@ -190,7 +189,7 @@ func main() {
 	}
 	for _, c := range NewScheme(m, base) {
 		r, g, b, _ := c.RGBA()
-		fmt.Printf("#%02x%02x%02x\n",
+		fmt.Printf("%02x%02x%02x\n",
 			uint8(r>>8),
 			uint8(g>>8),
 			uint8(b>>8))
