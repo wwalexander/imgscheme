@@ -44,19 +44,6 @@ func parseTriplet(triplet string) (RGB, error) {
 	return c, nil
 }
 
-func readImage(path string) (image.Image, error) {
-	file, err := os.Open(path)
-	defer file.Close()
-	if err != nil {
-		return nil, err
-	}
-	m, _, err := image.Decode(file)
-	if err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
 // RGB is a 24-bit RGB color.
 type RGB struct {
 	R, G, B uint8
@@ -138,14 +125,15 @@ var SchemeVGA = color.Palette{
 	RGB{0xff, 0xff, 0xff},
 }
 
-const usage = `usage: imgscheme [-n color]... file
+const usage = `usage: imgscheme [-N color] file
 
 imgscheme generates a terminal color scheme from an image file. It attempts to
 make the generated colors correspond to prominent colors in the image, and also
-close to the corresponding colors in a base color scheme. The colors in the base
-scheme can be set using numeric flags corresponding to the 16 ANSI colors (0-15)
-as hex triplets /[0-9a-f]{6}/ The generated colors will be output in order as
-hex triplets.`
+close to the corresponding colors in a base color scheme. If file is absent,
+imgscheme reads from the standard input. The colors in the base scheme can be
+set using numeric flags corresponding to the 16 ANSI colors (0-15) as hex
+triplets /[0-9a-f]{6}/ The generated colors will be output in order as hex
+triplets.`
 
 func main() {
 	colors := []*string{
@@ -171,7 +159,17 @@ func main() {
 	}
 	flag.Parse()
 	args := flag.Args()
-	if len(args) != 1 {
+	var file *os.File
+	if len(args) == 0 {
+		file = os.Stdin
+	} else if len(args) == 1 {
+		f, err := os.Open(args[0])
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer f.Close()
+		file = f
+	} else {
 		flag.Usage()
 		os.Exit(1)
 	}
@@ -183,7 +181,7 @@ func main() {
 		}
 		base[i] = color
 	}
-	m, err := readImage(args[0])
+	m, _, err := image.Decode(file)
 	if err != nil {
 		log.Fatal(err)
 	}
