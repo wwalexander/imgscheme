@@ -26,5 +26,5 @@ Examples
 
 ### Lena
 
-<img src="examples/lena.png" width="512px" />
 <img src="examples/lena-imgscheme.png" width="512px" />
+<img src="examples/lena.png" width="512px" />
