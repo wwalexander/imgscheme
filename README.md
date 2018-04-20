@@ -26,5 +26,5 @@ Examples
 
 ### Lena
 
-#![Girl (Lena, or Lenna)](examples/lena.png)
-#![Background and foreground terminal colors](examples/lena-imgscheme.png)
+<img src="examples/lena.png" width="250px" />
+<img src="examples/lena-imgscheme.png" width="250px" />
