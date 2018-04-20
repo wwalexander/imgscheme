@@ -20,6 +20,3 @@ imgscheme reads from the standard input. The colors in the base scheme can be
 set using numeric flags corresponding to the 16 ANSI colors (0-15) as hex
 triplets /[0-9a-f]{6}/ The generated colors will be output in order as hex
 triplets.
-
-The output of imgscheme can be rendered on
-[this page](https://wwalexander.github.io/imgscheme/).
