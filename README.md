@@ -1,8 +1,6 @@
 imgscheme
 =========
 
-Generates terminal color schemes from images and existing color schemes
-
 Building
 --------
 
